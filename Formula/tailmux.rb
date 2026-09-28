@@ -1,0 +1,76 @@
+class Tailmux < Formula
+  desc "Be on many Tailscale tailnets at once"
+  homepage "https://github.com/GrowlyX/tailmux"
+  url "https://github.com/GrowlyX/tailmux/archive/refs/tags/v0.1.0.tar.gz"
+  sha256 "0131464d1412e34733f576588d55d7b8b07e738dd3314c9582768d05e34a6105"
+  license "BSD-3-Clause"
+  head "https://github.com/GrowlyX/tailmux.git", branch: "main"
+
+  depends_on "go" => :build
+
+  def install
+    ldflags = %W[
+      -s -w
+      -X main.version=#{version}
+      -X main.defaultConfig=#{etc}/tailmux/config.json
+      -X github.com/GrowlyX/tailmux/internal/mux.DefaultStateDir=#{var}/lib/tailmux
+    ]
+    system "go", "build", *std_go_args(ldflags:), "./cmd/tailmux"
+    (pkgshare/"config.example.json").write Utils.safe_popen_read(bin/"tailmux", "example-config")
+
+    if OS.mac?
+      # The menu bar app. Plain SwiftPM, so the Command Line Tools suffice.
+      system "macos/build-app.sh", buildpath/"app", version.to_s
+      prefix.install buildpath/"app/TailmuxBar.app"
+    end
+  end
+
+  # Seeds a starter config once; never overwrites your edits.
+  post_install_steps do
+    mkdir_p "lib/tailmux", base: :var
+    mkdir_p "tailmux", base: :etc
+    unless_path_exists "tailmux/config.json", base: :etc do
+      copy "config.example.json", "tailmux/config.json", source_base: :pkgshare, target_base: :etc
+    end
+  end
+
+  def caveats
+    s = <<~EOS
+      Add your tailnets and log in to each:
+        tailmux setup
+
+      Proxy mode (SOCKS5 127.0.0.1:1055, HTTP proxy + PAC 127.0.0.1:1056):
+        brew services start tailmux
+      TUN mode, for every app without proxy settings (press t in setup), then
+        sudo brew services start tailmux
+      Pick one; state in #{var}/lib/tailmux is owned by whoever runs it.
+
+      Config: #{etc}/tailmux/config.json
+    EOS
+    if OS.mac?
+      s += <<~EOS
+
+        Menu bar app:
+          tailmux bar
+        or keep it in Applications (then enable "Open at login" in its menu):
+          ln -sf #{opt_prefix}/TailmuxBar.app /Applications/TailmuxBar.app
+      EOS
+    end
+    s
+  end
+
+  service do
+    run [opt_bin/"tailmux", "up", "-config", etc/"tailmux/config.json"]
+    keep_alive true
+    log_path var/"log/tailmux.log"
+    error_log_path var/"log/tailmux.log"
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/tailmux version")
+    (testpath/"config.json").write shell_output("#{bin}/tailmux example-config")
+    output = shell_output("#{bin}/tailmux status -config #{testpath}/config.json 2>&1", 1)
+    assert_match "is `tailmux up` running?", output
+    assert_predicate prefix/"TailmuxBar.app/Contents/MacOS/TailmuxBar", :executable? if OS.mac?
+  end
+end
