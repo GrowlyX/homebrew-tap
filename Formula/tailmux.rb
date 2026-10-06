@@ -1,8 +1,8 @@
 class Tailmux < Formula
   desc "Be on many Tailscale tailnets at once"
   homepage "https://github.com/GrowlyX/tailmux"
-  url "https://github.com/GrowlyX/tailmux/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "2794accaccda8e8e26e2291ea32c259028660055eb1285133d84b1dddce272f8"
+  url "https://github.com/GrowlyX/tailmux/archive/refs/tags/v1.1.0.tar.gz"
+  sha256 "e0b792a390169df199d0c806c29cb71444b6f942000ed2dc063b04f214168c36"
   license "BSD-3-Clause"
   head "https://github.com/GrowlyX/tailmux.git", branch: "main"
 
@@ -50,10 +50,10 @@ class Tailmux < Formula
     if OS.mac?
       s += <<~EOS
 
-        Menu bar app:
-          tailmux bar
-        or keep it in Applications (then enable "Open at login" in its menu):
-          ln -sf #{opt_prefix}/TailmuxBar.app /Applications/TailmuxBar.app
+        Menu bar app: `tailmux setup` (or `tailmux bar`) puts TailmuxBar.app
+        in /Applications, and tailmux keeps that copy current on upgrades.
+        Open it from Spotlight or Launchpad, then enable "Open at login"
+        in its settings.
       EOS
     end
     s
