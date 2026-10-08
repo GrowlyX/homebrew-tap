@@ -1,8 +1,8 @@
 class Tailmux < Formula
   desc "Be on many Tailscale tailnets at once"
   homepage "https://github.com/GrowlyX/tailmux"
-  url "https://github.com/GrowlyX/tailmux/archive/refs/tags/v1.1.1.tar.gz"
-  sha256 "23a13821f5c0e0cad9b170cea2345ac79eb048449702c131ac122b0871e11679"
+  url "https://github.com/GrowlyX/tailmux/archive/refs/tags/v1.1.2.tar.gz"
+  sha256 "c49b7296160f8e2850635e80b7d5152de5bd6232e3dcae12b2c1f3055a2ea179"
   license "BSD-3-Clause"
   head "https://github.com/GrowlyX/tailmux.git", branch: "main"
 
