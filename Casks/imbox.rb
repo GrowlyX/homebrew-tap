@@ -1,6 +1,6 @@
 cask "imbox" do
-  version "0.1.0"
-  sha256 "403c18efaa9ba412648f18f12c85ce02cdaf78a8e49b97c7cfc20e82f3ff9be4"
+  version "0.1.1"
+  sha256 "b699839bd782e23cf1c537c5b863cf1019d9166289a9879d9f24401b5d179abe"
 
   url "https://github.com/GrowlyX/imbox/releases/download/v#{version}/Imbox_#{version}_universal.dmg"
   name "Imbox"
